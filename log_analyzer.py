@@ -49,6 +49,7 @@ def parse_log(file):
                 parsed_lines += 1
                 yield data, summary_lines, parsed_lines
 
+
 def analyze_parsed_log(log_parser,top):
     """function for analyzing parsed data.
     Args:
@@ -109,6 +110,7 @@ def analyze_parsed_log(log_parser,top):
                 c='#' * int((1+(collums / 2 ) * (round(j/(len(ip[k])),3)))), c_width=len('Graph') ))
     logger.info(f'file {args.file} analyze complete for {round(time() - start_time, 2)} seconds')
 
+
 if __name__ == '__main__':
     start_time = time()
     parser = argparse.ArgumentParser(description='Input log file full path AND number of TOP')
@@ -132,9 +134,3 @@ if __name__ == '__main__':
     except Exception as e:
         logger.exception(f"Exception occurred during program execution, reason: {e}")
     urls = analyze_parsed_log(log_parser,top=args.top)
-
-
-
-
-
-

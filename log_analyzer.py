@@ -34,8 +34,10 @@ def parse_log(file):
         data: tuple with ip,date,urls.
         summary_lines: count of lines in file
     """
-    #line_format = re.compile(r'(?P<ipaddress>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - - \[(?P<dateandtime>\d{2}\/[a-zA-z]{3}\/\d{4}:\d{2}:\d{2}:\d{2})\ .* (?P<url>[\"][http://].*/[\"])', re.IGNORECASE)
-    line_format = re.compile(r'(?P<ipaddress>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - - \[(?P<dateandtime>\d{2}\/[a-zA-z]{3}\/\d{4}:\d{2}:\d{2}:\d{2})\ .*(?!((GET|POST))).*(?P<uri> /.* )(HTTP\/1\.1\")')
+    # line_format = re.compile(
+    #     r'(?P<ipaddress>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - - \[(?P<dateandtime>\d{2}\/[a-zA-z]{3}\/\d{4}:\d{2}:\d{2}:\d{2})\ .* (?P<url>[\"][http://].*/[\"])', re.IGNORECASE)
+    line_format = re.compile(
+       r'(?P<ipaddress>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - - \[(?P<dateandtime>\d{2}\/[a-zA-z]{3}\/\d{4}:\d{2}:\d{2}:\d{2})\ .*(?!((GET|POST))).*(?P<uri> /.* )(HTTP\/1\.1\")')
     logger.info(f'starting to parse the file {file}')
     opener = gzip.open if file.endswith('.gz') else open
     with opener(file, 'r') as f:
@@ -48,7 +50,7 @@ def parse_log(file):
             if data:
                 parsed_lines += 1
                 yield data, summary_lines, parsed_lines
-
+    logger.info(f'file {file} parsing complete for {round(time() - start_time, 2)} seconds')
 
 def analyze_parsed_log(log_parser,top):
     """function for analyzing parsed data.
@@ -62,7 +64,6 @@ def analyze_parsed_log(log_parser,top):
         4) Unique visits (by ip) per month sorted by month
         5) Top IPs barchart per month
     """
-    logger.info(f'file {args.file} parsing complete for {round(time() - start_time, 2)} seconds')
     ip_counter = Counter()
     url_counter = Counter()
     data_counter = Counter()
@@ -74,10 +75,7 @@ def analyze_parsed_log(log_parser,top):
             ip_counter[i[0]] += 1
             url_counter[i[4]] += 1
             data_counter[dm] += 1
-            try:
-                ip[dm].append(i[0])
-            except KeyError as e:
-                logger.exception(f"Exception occurred during program execution, reason: {e}")
+            ip[dm].append(i[0])
     dropped = round((summary_lines - parsed_lines) / summary_lines * 100, 3)
     logger.info(f'Sum lines: {summary_lines} Pased lines: {parsed_lines} Dropped: {dropped}% \n')
     print(f'Top {top} IP Addresses by hits')

@@ -34,8 +34,6 @@ def parse_log(file):
         data: tuple with ip,date,urls.
         summary_lines: count of lines in file
     """
-    # line_format = re.compile(
-    #     r'(?P<ipaddress>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - - \[(?P<dateandtime>\d{2}\/[a-zA-z]{3}\/\d{4}:\d{2}:\d{2}:\d{2})\ .* (?P<url>[\"][http://].*/[\"])', re.IGNORECASE)
     line_format = re.compile(
        r'(?P<ipaddress>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - - \[(?P<dateandtime>\d{2}\/[a-zA-z]{3}\/\d{4}:\d{2}:\d{2}:\d{2})\ .*(?!((GET|POST))).*(?P<uri> /.* )(HTTP\/1\.1\")')
     logger.info(f'starting to parse the file {file}')
@@ -50,7 +48,6 @@ def parse_log(file):
             if data:
                 parsed_lines += 1
                 yield data, summary_lines, parsed_lines
-    logger.info(f'file {file} parsing complete for {round(time() - start_time, 2)} seconds')
 
 def analyze_parsed_log(log_parser,top):
     """function for analyzing parsed data.
@@ -131,4 +128,5 @@ if __name__ == '__main__':
         log_parser = parse_log(file=args.file)
     except Exception as e:
         logger.exception(f"Exception occurred during program execution, reason: {e}")
+    logger.info(f'file {args.file} parsing complete for {round(time() - start_time, 4)} seconds')
     urls = analyze_parsed_log(log_parser,top=args.top)
